@@ -4,7 +4,7 @@ import os
 from openai import OpenAI
 from datetime import datetime
 
-st.write("API KEY:", st.secrets.get("OPENAI_API_KEY"))
+st.write("CHECK KEY:", st.secrets.get("OPENAI_API_KEY"))
 # ====== GOOGLE SHEET ======
 import gspread
 from google.oauth2.service_account import Credentials
