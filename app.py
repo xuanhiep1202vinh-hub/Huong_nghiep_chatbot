@@ -73,6 +73,23 @@ def load_data():
 
 df = load_data()
 
+# ====== TRACK VISITS ======
+today = datetime.now().strftime("%Y-%m-%d")
+
+df_stats = pd.read_csv(stats_file)
+
+if today in df_stats["date"].values:
+    df_stats.loc[df_stats["date"] == today, "visits"] += 1
+else:
+    new_row = pd.DataFrame([{
+        "date": today,
+        "visits": 1,
+        "questions": 0
+    }])
+    df_stats = pd.concat([df_stats, new_row], ignore_index=True)
+
+df_stats.to_csv(stats_file, index=False)
+
 # ====== SIDEBAR ======
 with st.sidebar:
     st.header("⚙️ Tùy chọn")
