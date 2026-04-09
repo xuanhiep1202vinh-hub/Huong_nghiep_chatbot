@@ -15,11 +15,12 @@ scope = [
 
 creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client_gs = gspread.authorize(creds)
+try:
 sheet = client_gs.open_by_url(
     "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
 ).sheet1
-except:
-    st.error("❌ Không kết nối được Google Sheet")
+except Exception as e:
+    st.error(f"❌ Lỗi kết nối Google Sheet: {e}")
 
 # ====== CONFIG ======
 st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
