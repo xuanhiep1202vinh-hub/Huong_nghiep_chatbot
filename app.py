@@ -78,13 +78,16 @@ user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 if user_input and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    with st.spinner("🤖 AI đang tư vấn..."):
+    with st.spinner("🤖 AI đang suy nghĩ..."):
 
-        # ====== SEARCH ======
+        # SEARCH
         matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
         context = matched.head(3).to_string() if not matched.empty else ""
 
-        # ====== AI ======
+        # AI
+        import os
+        from openai import OpenAI
+
         client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=os.getenv("OPENAI_API_KEY")
@@ -93,7 +96,7 @@ if user_input and user_input.strip() != "":
         if mode == "Gợi ý nghề":
             system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh."
         elif mode == "Khám phá nghề":
-            system_prompt = "Giải thích nghề chi tiết, dễ hiểu, có ví dụ thực tế."
+            system_prompt = "Giải thích nghề chi tiết, dễ hiểu."
         else:
             system_prompt = "Trả lời ngắn gọn, dễ hiểu."
 
@@ -106,7 +109,6 @@ Dữ liệu:
 Câu hỏi: {user_input}
 """
 
-with st.spinner("🤖 AI đang tư vấn cho bạn..."):
         response = client.chat.completions.create(
             model="meta-llama/llama-3-8b-instruct",
             messages=[{"role": "user", "content": prompt}]
@@ -114,8 +116,13 @@ with st.spinner("🤖 AI đang tư vấn cho bạn..."):
 
         answer = response.choices[0].message.content
 
-    st.session_state.messages.append({"role": "assistant", "content": answer})
-    st.rerun()
+        # ✅ DÒNG QUAN TRỌNG (phải cùng cấp với response)
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": answer
+        })
+
+        st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
 
