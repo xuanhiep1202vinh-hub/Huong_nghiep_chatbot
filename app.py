@@ -59,7 +59,7 @@ Khám phá nghề nghiệp phù hợp với bạn bằng AI 🚀
 # ====== LOAD DATA ======
 @st.cache_data
 def load_data():
-    return pd.read_excel("kho_du_lieu_300_nghe.xlsx")
+    return pd.read_excel("kho_du_lieu_1000_nghe.xlsx")
 
 df = load_data()
 
