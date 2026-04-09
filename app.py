@@ -16,7 +16,7 @@ scope = [
 creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client_gs = gspread.authorize(creds)
 try:
-sheet = client_gs.open_by_url(
+    sheet = client_gs.open_by_url(
     "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
 ).sheet1
 except Exception as e:
