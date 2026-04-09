@@ -100,7 +100,7 @@ Câu hỏi: {user_input}
 """
 
     response = client.chat.completions.create(
-    model="mistralai/mistral-7b-instruct:free",
+    model="openchat/openchat-3.5-0106",
     messages=[{"role": "user", "content": prompt}]
 )
 
