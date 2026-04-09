@@ -83,11 +83,11 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-    if mode == "Gợi ý nghề":
+if mode == "Gợi ý nghề":
         system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh dựa trên câu hỏi."
-    elif mode == "Khám phá nghề":
+elif mode == "Khám phá nghề":
         system_prompt = "Giải thích nghề chi tiết, dễ hiểu, có ví dụ thực tế."
-    else:
+else:
         system_prompt = "Trả lời ngắn gọn, dễ hiểu cho học sinh."
 
     prompt = f"""
