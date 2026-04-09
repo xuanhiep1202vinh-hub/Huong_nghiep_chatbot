@@ -144,7 +144,7 @@ CẤU TRÚC TRẢ LỜI:
         prompt = f"""
 {system_prompt}
 
-⚠️ BẮT BUỘC: Trả lời hoàn toàn bằng tiếng Việt. Không dùng tiếng Anh.
+⚠️ BẮT BUỘC: Trả lời hoàn toàn bằng tiếng Việt. Không dùng tiếng Anh và các ngôn ngữ khác.
 
 Dữ liệu:
 {context}
