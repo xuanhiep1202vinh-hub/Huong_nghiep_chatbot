@@ -74,30 +74,30 @@ if user_input:
     matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
     context = matched.head(3).to_string() if not matched.empty else ""
 
-    # ====== AI ======
+       # ====== AI ======
+    import os
     from openai import OpenAI
-import os
 
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
 
-if mode == "Gợi ý nghề":
+    if mode == "Gợi ý nghề":
         system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh dựa trên câu hỏi."
-elif mode == "Khám phá nghề":
+    elif mode == "Khám phá nghề":
         system_prompt = "Giải thích nghề chi tiết, dễ hiểu, có ví dụ thực tế."
-else:
+    else:
         system_prompt = "Trả lời ngắn gọn, dễ hiểu cho học sinh."
 
     prompt = f"""
-    {system_prompt}
+{system_prompt}
 
-    Dữ liệu:
-    {context}
+Dữ liệu:
+{context}
 
-    Câu hỏi: {user_input}
-    """
+Câu hỏi: {user_input}
+"""
 
     response = client.chat.completions.create(
         model="mistralai/mistral-7b-instruct",
