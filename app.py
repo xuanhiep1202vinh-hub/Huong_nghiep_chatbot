@@ -12,8 +12,6 @@ st.markdown("""
 body {
     background: linear-gradient(135deg, #eef2ff, #f8fafc);
 }
-</style>
-""", unsafe_allow_html=True)
 <style>
 .chat-container {
     max-height: 70vh;
