@@ -67,12 +67,10 @@ if "messages" not in st.session_state:
 # ====== MAIN LAYOUT ======
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-# Hiển thị chat
+# ====== CHAT KIỂU CHATGPT ======
 for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
 # ====== INPUT ======
 user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
