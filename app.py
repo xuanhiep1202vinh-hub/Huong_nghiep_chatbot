@@ -4,21 +4,24 @@ import os
 from openai import OpenAI
 from datetime import datetime
 
-# ====== GOOGLE SHEET (FIX CHUẨN) ======
+# ====== GOOGLE SHEET ======
 import gspread
 from google.oauth2.service_account import Credentials
 
-creds_dict = st.secrets["gcp_service_account"]
-creds = Credentials.from_service_account_info(creds_dict)
-client_gs = gspread.authorize(creds)
+# Kết nối Google Sheet từ secrets
+try:
+    creds_dict = st.secrets["gcp_service_account"]
+    creds = Credentials.from_service_account_info(creds_dict)
+    client_gs = gspread.authorize(creds)
 
-sheet = client_gs.open_by_url(
-    "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
-).sheet1
+    sheet = client_gs.open_by_url(
+        "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
+    ).sheet1
 
+    SHEET_OK = True
 except Exception as e:
-    st.error(f"❌ Lỗi kết nối Google Sheet: {e}")
-    sheet = None
+    st.error(f"❌ Lỗi Google Sheet: {e}")
+    SHEET_OK = False
 
 # ====== CONFIG ======
 st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
@@ -29,7 +32,6 @@ st.markdown("""
 body {
     background: linear-gradient(135deg, #eef2ff, #f8fafc);
 }
-
 .chat-container {
     max-height: 70vh;
     overflow-y: auto;
@@ -57,22 +59,19 @@ df = load_data()
 # ====== LOAD / UPDATE STATS ======
 today = datetime.now().strftime("%Y-%m-%d")
 
-if sheet:
+if SHEET_OK:
     data = sheet.get_all_records()
     df_stats = pd.DataFrame(data)
 
-    # Nếu chưa có ngày hôm nay → thêm
     if df_stats.empty or today not in df_stats["date"].values:
         sheet.append_row([today, 1, 0])
     else:
         row_index = df_stats.index[df_stats["date"] == today][0] + 2
-        current_visits = int(df_stats.loc[df_stats["date"] == today, "visits"].values[0])
-        sheet.update_cell(row_index, 2, current_visits + 1)
+        visits = int(df_stats.loc[df_stats["date"] == today, "visits"].values[0])
+        sheet.update_cell(row_index, 2, visits + 1)
 
-    # Reload
-    data = sheet.get_all_records()
-    df_stats = pd.DataFrame(data)
-
+    # reload
+    df_stats = pd.DataFrame(sheet.get_all_records())
 else:
     df_stats = pd.DataFrame(columns=["date", "visits", "questions"])
 
@@ -91,13 +90,13 @@ with st.sidebar:
     st.divider()
     st.subheader("📊 Thống kê")
 
-    today_data = df_stats[df_stats["date"] == today]
-
-    if not today_data.empty:
-        st.write("👀 Hôm nay:", int(today_data["visits"].values[0]))
-        st.write("💬 Hỏi hôm nay:", int(today_data["questions"].values[0]))
-
     if not df_stats.empty:
+        today_data = df_stats[df_stats["date"] == today]
+
+        if not today_data.empty:
+            st.write("👀 Hôm nay:", int(today_data["visits"].values[0]))
+            st.write("💬 Hỏi hôm nay:", int(today_data["questions"].values[0]))
+
         st.write("📈 Tổng truy cập:", int(df_stats["visits"].sum()))
         st.write("📈 Tổng câu hỏi:", int(df_stats["questions"].sum()))
 
@@ -135,7 +134,7 @@ if col4.button("🎓 Học lực trung bình nên chọn gì?"):
 if user_input and user_input.strip() != "":
 
     # ====== UPDATE QUESTIONS ======
-    if sheet:
+    if SHEET_OK:
         data = sheet.get_all_records()
         df_stats = pd.DataFrame(data)
 
