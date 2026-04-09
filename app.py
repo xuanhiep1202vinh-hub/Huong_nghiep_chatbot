@@ -107,14 +107,17 @@ user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 st.write("💡 Bạn có thể hỏi:")
 col1, col2, col3 = st.columns(3)
 
-if col1.button("Nghề IT là gì?"):
-    user_input = "Nghề IT là gì?"
+if col1.button("💰 Top ngành lương cao nhất hiện nay là gì?"):
+    user_input = "💰 Top ngành lương cao nhất hiện nay là gì?"
 
-elif col2.button("Ngành nào lương cao?"):
-    user_input = "Ngành nào lương cao?"
+elif col2.button("🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"):
+    user_input = "🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"
 
-elif col3.button("Tôi hợp nghề gì?"):
-    user_input = "Tôi hợp nghề gì?"
+elif col3.button("🤖 Nghề nào ít bị AI thay thế trong tương lai?"):
+    user_input = "🤖 Nghề nào ít bị AI thay thế trong tương lai?"
+
+elif col4.button("🎓 Học lực trung bình nên chọn ngành gì?"):
+    user_input = "🎓 Học lực trung bình nên chọn ngành gì?"
 
 # ====== XỬ LÝ ======
 if user_input and user_input.strip() != "":
