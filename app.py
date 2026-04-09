@@ -121,11 +121,11 @@ if user_input and user_input.strip() != "":
         )
 
         if mode == "Gợi ý nghề":
-            system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh."
+            system_prompt = "Bạn là chuyên gia hướng nghiệp. LUÔN trả lời bằng tiếng Việt, dễ hiểu cho học sinh."
         elif mode == "Khám phá nghề":
-            system_prompt = "Giải thích nghề chi tiết, dễ hiểu."
+            system_prompt = "Giải thích nghề chi tiết, dễ hiểu, LUÔN bằng tiếng Việt."
         else:
-            system_prompt = "Trả lời ngắn gọn, dễ hiểu."
+            system_prompt = "Trả lời ngắn gọn, dễ hiểu, LUÔN bằng tiếng Việt."
 
         prompt = f"""
 {system_prompt}
