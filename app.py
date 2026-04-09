@@ -110,13 +110,13 @@ col1, col2, col3, col4 = st.columns(4)
 if col1.button("💰 Top ngành lương cao nhất hiện nay là gì?"):
     user_input = "💰 Top ngành lương cao nhất hiện nay là gì?"
 
-elif col2.button("🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"):
+if col2.button("🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"):
     user_input = "🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"
 
-elif col3.button("🤖 Nghề nào ít bị AI thay thế trong tương lai?"):
+if col3.button("🤖 Nghề nào ít bị AI thay thế trong tương lai?"):
     user_input = "🤖 Nghề nào ít bị AI thay thế trong tương lai?"
 
-elif col4.button("🎓 Học lực trung bình nên chọn ngành gì?"):
+if col4.button("🎓 Học lực trung bình nên chọn ngành gì?"):
     user_input = "🎓 Học lực trung bình nên chọn ngành gì?"
 
 # ====== XỬ LÝ ======
