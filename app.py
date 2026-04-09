@@ -130,6 +130,8 @@ if user_input and user_input.strip() != "":
         prompt = f"""
 {system_prompt}
 
+⚠️ BẮT BUỘC: Trả lời hoàn toàn bằng tiếng Việt. Không dùng tiếng Anh.
+
 Dữ liệu:
 {context}
 
