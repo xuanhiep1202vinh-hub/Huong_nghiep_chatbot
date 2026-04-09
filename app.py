@@ -53,8 +53,8 @@ df = load_data()
 # ====== SIDEBAR ======
 with st.sidebar:
     if st.button("🗑️ Xóa chat"):
-    st.session_state.messages = []
-    st.rerun()
+        st.session_state.messages = []
+        st.rerun()
     st.header("⚙️ Tùy chọn")
     mode = st.radio("Chế độ:", ["Hỏi đáp", "Khám phá nghề", "Gợi ý nghề"])
 
