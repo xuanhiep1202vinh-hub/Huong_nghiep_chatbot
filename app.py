@@ -108,7 +108,12 @@ if user_input and user_input.strip() != "":
     with st.spinner("🤖 AI đang suy nghĩ..."):
 
         # SEARCH
-        matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
+        keywords = user_input.lower().split()
+
+        matched = df[df.apply(
+            lambda row: any(keyword in str(row).lower() for keyword in keywords),
+            axis=1
+        )]
         context = matched.head(3).to_string() if not matched.empty else ""
 
         # AI
