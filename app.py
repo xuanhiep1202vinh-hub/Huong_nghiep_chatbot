@@ -120,4 +120,4 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # ====== FOOTER ======
 st.divider()
-st.caption("🚀 Demo bởi AI - Có thể nâng cấp thành app thật")
+st.caption("🚀 Được tạo bởi Hồ Xuân Hiệp - Tiếp tục được nâng cấp để hoàn thiện")
