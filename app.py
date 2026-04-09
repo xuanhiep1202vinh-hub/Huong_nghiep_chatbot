@@ -52,15 +52,14 @@ df = load_data()
 
 # ====== SIDEBAR ======
 with st.sidebar:
-    if st.button("🗑️ Xóa chat"):
-        st.session_state.messages = []
-        st.rerun()
     st.header("⚙️ Tùy chọn")
     mode = st.radio("Chế độ:", ["Hỏi đáp", "Khám phá nghề", "Gợi ý nghề"])
 
     st.divider()
     st.write("📊 Tổng số nghề:", len(df))
-
+    if st.button("🗑️ Xóa chat"):
+        st.session_state.messages = []
+        st.rerun()
 # ====== INIT CHAT ======
 if "messages" not in st.session_state:
     st.session_state.messages = []
