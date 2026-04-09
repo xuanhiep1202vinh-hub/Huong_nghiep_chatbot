@@ -8,10 +8,19 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
-# Kết nối Google Sheet từ secrets
 try:
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
     creds_dict = st.secrets["gcp_service_account"]
-    creds = Credentials.from_service_account_info(creds_dict)
+
+    creds = Credentials.from_service_account_info(
+        creds_dict,
+        scopes=scope
+    )
+
     client_gs = gspread.authorize(creds)
 
     sheet = client_gs.open_by_url(
