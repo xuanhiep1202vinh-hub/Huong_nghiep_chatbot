@@ -52,6 +52,9 @@ df = load_data()
 
 # ====== SIDEBAR ======
 with st.sidebar:
+if st.button("🗑️ Xóa chat"):
+    st.session_state.messages = []
+    st.rerun()
     st.header("⚙️ Tùy chọn")
     mode = st.radio("Chế độ:", ["Hỏi đáp", "Khám phá nghề", "Gợi ý nghề"])
 
@@ -78,7 +81,7 @@ user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 if user_input and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    with st.spinner("🤖 AI đang suy nghĩ..."):
+    with st.spinner("🤖 AI đang tư vấn..."):
 
         # ====== SEARCH ======
         matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
