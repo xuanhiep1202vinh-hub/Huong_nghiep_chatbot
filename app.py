@@ -4,23 +4,28 @@ import os
 from openai import OpenAI
 from datetime import datetime
 
-# ====== GOOGLE SHEET ======
+# ====== GOOGLE SHEET (FIX CHUẨN) ======
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
-scope = [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive"
-]
-
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-client_gs = gspread.authorize(creds)
 try:
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+    )
+
+    client_gs = gspread.authorize(creds)
+
     sheet = client_gs.open_by_url(
-    "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
-).sheet1
+        "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
+    ).sheet1
+
 except Exception as e:
     st.error(f"❌ Lỗi kết nối Google Sheet: {e}")
+    sheet = None
 
 # ====== CONFIG ======
 st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
@@ -56,22 +61,27 @@ def load_data():
 
 df = load_data()
 
-# ====== LOAD STATS FROM GOOGLE SHEET ======
+# ====== LOAD / UPDATE STATS ======
 today = datetime.now().strftime("%Y-%m-%d")
 
-data = sheet.get_all_records()
-df_stats = pd.DataFrame(data)
+if sheet:
+    data = sheet.get_all_records()
+    df_stats = pd.DataFrame(data)
 
-if df_stats.empty or today not in df_stats["date"].values:
-    sheet.append_row([today, 1, 0])
+    # Nếu chưa có ngày hôm nay → thêm
+    if df_stats.empty or today not in df_stats["date"].values:
+        sheet.append_row([today, 1, 0])
+    else:
+        row_index = df_stats.index[df_stats["date"] == today][0] + 2
+        current_visits = int(df_stats.loc[df_stats["date"] == today, "visits"].values[0])
+        sheet.update_cell(row_index, 2, current_visits + 1)
+
+    # Reload
+    data = sheet.get_all_records()
+    df_stats = pd.DataFrame(data)
+
 else:
-    row_index = df_stats.index[df_stats["date"] == today][0] + 2
-    current_visits = int(df_stats.loc[df_stats["date"] == today, "visits"].values[0])
-    sheet.update_cell(row_index, 2, current_visits + 1)
-
-# Reload
-data = sheet.get_all_records()
-df_stats = pd.DataFrame(data)
+    df_stats = pd.DataFrame(columns=["date", "visits", "questions"])
 
 # ====== SIDEBAR ======
 with st.sidebar:
@@ -94,8 +104,9 @@ with st.sidebar:
         st.write("👀 Hôm nay:", int(today_data["visits"].values[0]))
         st.write("💬 Hỏi hôm nay:", int(today_data["questions"].values[0]))
 
-    st.write("📈 Tổng truy cập:", int(df_stats["visits"].sum()))
-    st.write("📈 Tổng câu hỏi:", int(df_stats["questions"].sum()))
+    if not df_stats.empty:
+        st.write("📈 Tổng truy cập:", int(df_stats["visits"].sum()))
+        st.write("📈 Tổng câu hỏi:", int(df_stats["questions"].sum()))
 
 # ====== INIT CHAT ======
 if "messages" not in st.session_state:
@@ -115,29 +126,30 @@ user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 st.write("💡 Bạn có thể hỏi:")
 col1, col2, col3, col4 = st.columns(4)
 
-if col1.button("💰 Top ngành lương cao nhất hiện nay là gì?"):
-    user_input = "Top ngành lương cao nhất hiện nay là gì?"
+if col1.button("💰 Ngành nào lương cao nhất?"):
+    user_input = "Ngành nào lương cao nhất?"
 
-if col2.button("🧠 Test nhanh: Bạn hợp nghề nào?"):
-    user_input = "Test nhanh: Tôi hợp nghề gì?"
+if col2.button("🧠 Tôi hợp nghề gì?"):
+    user_input = "Tôi hợp nghề gì?"
 
 if col3.button("🤖 Nghề nào không bị AI thay thế?"):
     user_input = "Nghề nào ít bị AI thay thế?"
 
-if col4.button("🎓 Học lực trung bình nên chọn ngành gì?"):
+if col4.button("🎓 Học lực trung bình nên chọn gì?"):
     user_input = "Học lực trung bình nên chọn ngành gì?"
 
 # ====== XỬ LÝ ======
 if user_input and user_input.strip() != "":
 
     # ====== UPDATE QUESTIONS ======
-    data = sheet.get_all_records()
-    df_stats = pd.DataFrame(data)
+    if sheet:
+        data = sheet.get_all_records()
+        df_stats = pd.DataFrame(data)
 
-    if today in df_stats["date"].values:
-        row_index = df_stats.index[df_stats["date"] == today][0] + 2
-        current_q = int(df_stats.loc[df_stats["date"] == today, "questions"].values[0])
-        sheet.update_cell(row_index, 3, current_q + 1)
+        if today in df_stats["date"].values:
+            row_index = df_stats.index[df_stats["date"] == today][0] + 2
+            current_q = int(df_stats.loc[df_stats["date"] == today, "questions"].values[0])
+            sheet.update_cell(row_index, 3, current_q + 1)
 
     st.session_state.messages.append({"role": "user", "content": user_input})
 
