@@ -9,6 +9,12 @@ st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
 # ====== CUSTOM CSS ======
 st.markdown("""
 <style>
+body {
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+}
+</style>
+""", unsafe_allow_html=True)
+<style>
 .chat-container {
     max-height: 70vh;
     overflow-y: auto;
