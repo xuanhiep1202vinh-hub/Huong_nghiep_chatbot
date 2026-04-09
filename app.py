@@ -4,12 +4,18 @@ import os
 from openai import OpenAI
 from datetime import datetime
 
-# ====== FILE THỐNG KÊ ======
-stats_file = "stats.csv"
+# ====== GOOGLE SHEET ======
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
-if not os.path.exists(stats_file):
-    df_stats = pd.DataFrame(columns=["date", "visits", "questions"])
-    df_stats.to_csv(stats_file, index=False)
+scope = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+]
+
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+client_gs = gspread.authorize(creds)
+sheet = client_gs.open("ThongKeAIHuongNghiep").sheet1
 
 # ====== CONFIG ======
 st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
@@ -28,7 +34,6 @@ body {
     background: #f7f9fc;
     border-radius: 15px;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -46,21 +51,22 @@ def load_data():
 
 df = load_data()
 
-# ====== TRACK VISITS ======
+# ====== LOAD STATS FROM GOOGLE SHEET ======
 today = datetime.now().strftime("%Y-%m-%d")
-df_stats = pd.read_csv(stats_file)
 
-if today in df_stats["date"].values:
-    df_stats.loc[df_stats["date"] == today, "visits"] += 1
+data = sheet.get_all_records()
+df_stats = pd.DataFrame(data)
+
+if df_stats.empty or today not in df_stats["date"].values:
+    sheet.append_row([today, 1, 0])
 else:
-    new_row = pd.DataFrame([{
-        "date": today,
-        "visits": 1,
-        "questions": 0
-    }])
-    df_stats = pd.concat([df_stats, new_row], ignore_index=True)
+    row_index = df_stats.index[df_stats["date"] == today][0] + 2
+    current_visits = int(df_stats.loc[df_stats["date"] == today, "visits"].values[0])
+    sheet.update_cell(row_index, 2, current_visits + 1)
 
-df_stats.to_csv(stats_file, index=False)
+# Reload
+data = sheet.get_all_records()
+df_stats = pd.DataFrame(data)
 
 # ====== SIDEBAR ======
 with st.sidebar:
@@ -70,16 +76,13 @@ with st.sidebar:
     st.divider()
     st.write("📊 Tổng số nghề:", len(df))
 
-    # Nút xoá chat
     if st.button("🗑️ Xóa chat"):
         st.session_state.messages = []
         st.rerun()
 
-    # ====== THỐNG KÊ ======
     st.divider()
     st.subheader("📊 Thống kê")
 
-    df_stats = pd.read_csv(stats_file)
     today_data = df_stats[df_stats["date"] == today]
 
     if not today_data.empty:
@@ -108,24 +111,28 @@ st.write("💡 Bạn có thể hỏi:")
 col1, col2, col3, col4 = st.columns(4)
 
 if col1.button("💰 Top ngành lương cao nhất hiện nay là gì?"):
-    user_input = "💰 Top ngành lương cao nhất hiện nay là gì?"
+    user_input = "Top ngành lương cao nhất hiện nay là gì?"
 
-if col2.button("🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"):
-    user_input = "🧠 Test nhanh: Bạn hợp nghề nào trong 60 giây?"
+if col2.button("🧠 Test nhanh: Bạn hợp nghề nào?"):
+    user_input = "Test nhanh: Tôi hợp nghề gì?"
 
-if col3.button("🤖 Nghề nào ít bị AI thay thế trong tương lai?"):
-    user_input = "🤖 Nghề nào ít bị AI thay thế trong tương lai?"
+if col3.button("🤖 Nghề nào không bị AI thay thế?"):
+    user_input = "Nghề nào ít bị AI thay thế?"
 
 if col4.button("🎓 Học lực trung bình nên chọn ngành gì?"):
-    user_input = "🎓 Học lực trung bình nên chọn ngành gì?"
+    user_input = "Học lực trung bình nên chọn ngành gì?"
 
 # ====== XỬ LÝ ======
 if user_input and user_input.strip() != "":
 
-    # TRACK QUESTIONS
-    df_stats = pd.read_csv(stats_file)
-    df_stats.loc[df_stats["date"] == today, "questions"] += 1
-    df_stats.to_csv(stats_file, index=False)
+    # ====== UPDATE QUESTIONS ======
+    data = sheet.get_all_records()
+    df_stats = pd.DataFrame(data)
+
+    if today in df_stats["date"].values:
+        row_index = df_stats.index[df_stats["date"] == today][0] + 2
+        current_q = int(df_stats.loc[df_stats["date"] == today, "questions"].values[0])
+        sheet.update_cell(row_index, 3, current_q + 1)
 
     st.session_state.messages.append({"role": "user", "content": user_input})
 
@@ -155,24 +162,18 @@ Lương: {r.get('Mức lương', '')}
             api_key=os.getenv("OPENAI_API_KEY")
         )
 
-        if mode == "Gợi ý nghề":
-            system_prompt = "Bạn là chuyên gia hướng nghiệp. LUÔN trả lời bằng tiếng Việt, dễ hiểu."
-        elif mode == "Khám phá nghề":
-            system_prompt = "Giải thích nghề chi tiết, dễ hiểu, LUÔN bằng tiếng Việt."
-        else:
-            system_prompt = """
+        system_prompt = """
 Bạn là chuyên gia hướng nghiệp cho học sinh.
 
 YÊU CẦU:
 - Luôn trả lời bằng tiếng Việt
-- Viết rõ ràng, dễ hiểu
+- Rõ ràng, dễ hiểu
 - Có ví dụ thực tế
+- Trình bày dạng gạch đầu dòng
 """
 
         prompt = f"""
 {system_prompt}
-
-⚠️ BẮT BUỘC: Trả lời hoàn toàn bằng tiếng Việt.
 
 Dữ liệu:
 {context}
