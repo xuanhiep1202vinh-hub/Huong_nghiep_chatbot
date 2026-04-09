@@ -8,16 +8,9 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
-try:
-    creds = Credentials.from_service_account_info(
-        st.secrets["gcp_service_account"],
-        scopes=[
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive"
-        ]
-    )
-
-    client_gs = gspread.authorize(creds)
+creds_dict = st.secrets["gcp_service_account"]
+creds = Credentials.from_service_account_info(creds_dict)
+client_gs = gspread.authorize(creds)
 
     sheet = client_gs.open_by_url(
         "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
