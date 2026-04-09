@@ -52,7 +52,7 @@ df = load_data()
 
 # ====== SIDEBAR ======
 with st.sidebar:
-if st.button("🗑️ Xóa chat"):
+    if st.button("🗑️ Xóa chat"):
     st.session_state.messages = []
     st.rerun()
     st.header("⚙️ Tùy chọn")
