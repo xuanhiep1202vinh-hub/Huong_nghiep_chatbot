@@ -110,11 +110,22 @@ if user_input and user_input.strip() != "":
         # SEARCH
         keywords = user_input.lower().split()
 
-        matched = df[df.apply(
-            lambda row: any(keyword in str(row).lower() for keyword in keywords),
-            axis=1
-        )]
-        context = matched.head(3).to_string() if not matched.empty else ""
+        matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
+
+        if not matched.empty:
+            rows = matched.head(3).to_dict(orient="records")
+            context = ""
+
+            for r in rows:
+                context += f"""
+        Tên nghề: {r.get('Tên nghề', '')}
+        Mô tả: {r.get('Mô tả', '')}
+        Kỹ năng: {r.get('Kỹ năng', '')}
+        Lương: {r.get('Mức lương', '')}
+        -----------------
+        """
+        else:
+            context = ""
 
         # AI
         import os
