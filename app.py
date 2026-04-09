@@ -105,7 +105,7 @@ user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 
 # ====== GỢI Ý ======
 st.write("💡 Bạn có thể hỏi:")
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 if col1.button("💰 Top ngành lương cao nhất hiện nay là gì?"):
     user_input = "💰 Top ngành lương cao nhất hiện nay là gì?"
