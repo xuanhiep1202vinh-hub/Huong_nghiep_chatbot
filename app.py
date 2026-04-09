@@ -86,7 +86,19 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 # ====== INPUT ======
-user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
+# ====== GỢI Ý CÂU HỎI ======
+st.write("💡 Bạn có thể hỏi:")
+
+col1, col2, col3 = st.columns(3)
+
+if col1.button("Nghề IT là gì?"):
+    user_input = "Nghề IT là gì?"
+
+if col2.button("Ngành nào lương cao?"):
+    user_input = "Ngành nào lương cao?"
+
+if col3.button("Tôi hợp nghề gì?"):
+    user_input = "Tôi hợp nghề gì?"
 
 if user_input and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
