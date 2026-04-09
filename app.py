@@ -12,9 +12,10 @@ creds_dict = st.secrets["gcp_service_account"]
 creds = Credentials.from_service_account_info(creds_dict)
 client_gs = gspread.authorize(creds)
 
-sheet = client_gs.open_by_url(
-    "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
-).sheet1
+try:
+    sheet = client_gs.open_by_url(
+        "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
+    ).sheet1
 
 except Exception as e:
     st.error(f"❌ Lỗi kết nối Google Sheet: {e}")
