@@ -18,6 +18,8 @@ client_gs = gspread.authorize(creds)
 sheet = client_gs.open_by_url(
     "https://docs.google.com/spreadsheets/d/1NUv2oLQhGjMjXKJNOXbq36JCnkKjtE9OvKQ5UIvCor8/edit"
 ).sheet1
+except:
+    st.error("❌ Không kết nối được Google Sheet")
 
 # ====== CONFIG ======
 st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
