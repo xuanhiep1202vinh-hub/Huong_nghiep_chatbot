@@ -3,6 +3,16 @@ import pandas as pd
 import os
 from openai import OpenAI
 
+import os
+from datetime import datetime
+
+stats_file = "stats.csv"
+
+# Nếu chưa có file thì tạo
+if not os.path.exists(stats_file):
+    df_stats = pd.DataFrame(columns=["date", "visits", "questions"])
+    df_stats.to_csv(stats_file, index=False)
+
 # ====== CONFIG ======
 st.set_page_config(page_title="Hướng Nghiệp AI", layout="wide")
 
