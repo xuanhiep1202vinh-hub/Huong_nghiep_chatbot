@@ -107,6 +107,7 @@ Dữ liệu:
 
 Câu hỏi: {user_input}
 """
+
 with st.spinner("🤖 AI đang tư vấn cho bạn..."):
         response = client.chat.completions.create(
             model="meta-llama/llama-3-8b-instruct",
