@@ -130,6 +130,11 @@ elif col3.button("Tôi hợp nghề gì?"):
     user_input = "Tôi hợp nghề gì?"
 
 if user_input and user_input.strip() != "":
+    
+    # ====== TRACK QUESTIONS ======
+    df_stats = pd.read_csv(stats_file)
+    df_stats.loc[df_stats["date"] == today, "questions"] += 1
+    df_stats.to_csv(stats_file, index=False)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     with st.spinner("🤖 AI đang suy nghĩ..."):
