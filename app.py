@@ -44,8 +44,17 @@ body {
 """, unsafe_allow_html=True)
 
 # ====== HEADER ======
-st.title("🎓 AI Hướng Nghiệp")
-st.caption("Trải nghiệm tư vấn nghề nghiệp như người thật")
+st.markdown("""
+<h1 style='text-align: center; font-size: 42px;'>
+🎓 AI Hướng Nghiệp
+</h1>
+
+<p style='text-align: center; font-size:18px; color: gray;'>
+Khám phá nghề nghiệp phù hợp với bạn bằng AI 🚀
+</p>
+
+<hr>
+""", unsafe_allow_html=True)
 
 # ====== LOAD DATA ======
 @st.cache_data
