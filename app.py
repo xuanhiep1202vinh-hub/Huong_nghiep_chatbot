@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 from openai import OpenAI
 
 # ====== CONFIG ======
@@ -64,7 +65,7 @@ if "messages" not in st.session_state:
 # ====== MAIN LAYOUT ======
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-# Display messages
+# Hiển thị chat
 for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
@@ -77,29 +78,26 @@ user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 if user_input and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-with st.spinner("🤖 AI đang suy nghĩ..."):
+    with st.spinner("🤖 AI đang suy nghĩ..."):
 
-    # ====== SEARCH ======
-    matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
-    context = matched.head(3).to_string() if not matched.empty else ""
+        # ====== SEARCH ======
+        matched = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
+        context = matched.head(3).to_string() if not matched.empty else ""
 
-       # ====== AI ======
-    import os
-    from openai import OpenAI
+        # ====== AI ======
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
 
-    client = OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=os.getenv("OPENAI_API_KEY")
-    )
+        if mode == "Gợi ý nghề":
+            system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh."
+        elif mode == "Khám phá nghề":
+            system_prompt = "Giải thích nghề chi tiết, dễ hiểu, có ví dụ thực tế."
+        else:
+            system_prompt = "Trả lời ngắn gọn, dễ hiểu."
 
-    if mode == "Gợi ý nghề":
-        system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh dựa trên câu hỏi."
-    elif mode == "Khám phá nghề":
-        system_prompt = "Giải thích nghề chi tiết, dễ hiểu, có ví dụ thực tế."
-    else:
-        system_prompt = "Trả lời ngắn gọn, dễ hiểu cho học sinh."
-
-    prompt = f"""
+        prompt = f"""
 {system_prompt}
 
 Dữ liệu:
@@ -108,12 +106,12 @@ Dữ liệu:
 Câu hỏi: {user_input}
 """
 
-    response = client.chat.completions.create(
-    model="meta-llama/llama-3-8b-instruct",
-    messages=[{"role": "user", "content": prompt}]
-)
+        response = client.chat.completions.create(
+            model="openchat/openchat-3.5-0106",
+            messages=[{"role": "user", "content": prompt}]
+        )
 
-    answer = response.choices[0].message.content
+        answer = response.choices[0].message.content
 
     st.session_state.messages.append({"role": "assistant", "content": answer})
     st.rerun()
