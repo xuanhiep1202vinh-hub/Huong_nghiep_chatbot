@@ -74,7 +74,7 @@ for msg in st.session_state.messages:
 # ====== INPUT ======
 user_input = st.chat_input("💬 Hỏi về nghề bạn quan tâm...")
 
-if user_input:
+if user_input and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
 
 with st.spinner("🤖 AI đang suy nghĩ..."):
