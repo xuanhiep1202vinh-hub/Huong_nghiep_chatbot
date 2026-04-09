@@ -75,7 +75,13 @@ if user_input:
     context = matched.head(3).to_string() if not matched.empty else ""
 
     # ====== AI ======
-    client = OpenAI(api_key="YOUR_API_KEY")
+    from openai import OpenAI
+import os
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 
     if mode == "Gợi ý nghề":
         system_prompt = "Bạn là chuyên gia hướng nghiệp. Hãy gợi ý nghề phù hợp với học sinh dựa trên câu hỏi."
@@ -94,7 +100,7 @@ if user_input:
     """
 
     response = client.chat.completions.create(
-        model="gpt-4.1-mini",
+        model="mistralai/mistral-7b-instruct",
         messages=[{"role": "user", "content": prompt}]
     )
 
