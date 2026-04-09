@@ -100,6 +100,19 @@ with st.sidebar:
     if st.button("🗑️ Xóa chat"):
         st.session_state.messages = []
         st.rerun()
+        st.divider()
+        st.subheader("📊 Thống kê")
+
+        df_stats = pd.read_csv(stats_file)
+
+        today_data = df_stats[df_stats["date"] == today]
+
+        if not today_data.empty:
+            st.write("👀 Lượt truy cập hôm nay:", int(today_data["visits"].values[0]))
+            st.write("💬 Câu hỏi hôm nay:", int(today_data["questions"].values[0]))
+
+            st.write("📈 Tổng lượt truy cập:", int(df_stats["visits"].sum()))
+            st.write("📈 Tổng câu hỏi:", int(df_stats["questions"].sum()))
 # ====== INIT CHAT ======
 if "messages" not in st.session_state:
     st.session_state.messages = []
